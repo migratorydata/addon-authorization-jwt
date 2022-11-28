@@ -23,10 +23,10 @@ public class EventSubscribeTest {
     private String validToken = generateToken(100);
 
     // subject /s/s has permission for publish
-    private String validTokenWithPublishPermission = generateToken(100, subject, Util.PUBLISH_PERMISSION);
+    private String validTokenWithPublishPermission = generateToken(100, subject, Util.PUB_FIELD);
 
     // subject /s/s has permission for subscribe
-    private String validTokenWithSubscribePermission = generateToken(100, subject, Util.SUBSCRIBE_PERMISSION);
+    private String validTokenWithSubscribePermission = generateToken(100, subject, Util.SUB_FIELD);
 
     @After
     public void onDispose() {

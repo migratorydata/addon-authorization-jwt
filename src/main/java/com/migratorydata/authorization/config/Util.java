@@ -6,29 +6,23 @@ public class Util {
     /*
     Here is an example of the payload of a JWT token:
     {
-      "permissions": [
-        {
-          "s": "/server/status",
-          "op": "ps"
-        },
-        {
-          "s": "/demo/notification",
-          "op": "s"
-        },
-        {
-          "s": "/sensor/temp",
-          "op": "p"
-        },
-      ]
+    "permissions": {
+        "sub": [
+          "/demo/notification"
+        ],
+        "pub": [
+          "/sensor/temp"
+        ],
+        "all": [
+          "/server/status"
+        ]
+      }
     }
     */
     public static final String PERMISSIONS_FIELD = "permissions";
-    public static final String SUBJECT_FIELD = "s";
-    public static final String OPERATION_FIELD = "op";
-
-    public static final String SUBSCRIBE_PERMISSION = "s";
-    public static final String PUBLISH_PERMISSION = "p";
-    public static final String PUBLISH_SUBSCRIBE_PERMISSION = "ps";
+    public static final String SUB_FIELD = "sub";
+    public static final String PUB_FIELD = "pub";
+    public static final String ALL_FIELD = "all";
 
     private static final Pattern subjectSyntax = Pattern.compile("[a-zA-Z0-9\\._\\-]+");
     private static int maxSubjectLength = 249;
@@ -55,14 +49,5 @@ public class Util {
             return false;
         }
         return subjectSyntax.matcher(sbj).matches();
-    }
-
-    /*
-    Currently, the permitted operations concerning a subject are: subscribe, publish, or both publish and subscribe.
-     */
-    public static boolean isOperationValid(String operation) {
-        return (SUBSCRIBE_PERMISSION.equals(operation) ||
-                PUBLISH_PERMISSION.equals(operation) ||
-                PUBLISH_SUBSCRIBE_PERMISSION.equals(operation));
     }
 }

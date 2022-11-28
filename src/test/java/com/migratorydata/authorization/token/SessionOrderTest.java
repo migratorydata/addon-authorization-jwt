@@ -6,16 +6,11 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 
 public class SessionOrderTest {
 
@@ -119,20 +114,17 @@ public class SessionOrderTest {
     }
 
     public static String generateToken(int ttl) {
-        return generateToken(ttl, "/s/s", Util.PUBLISH_SUBSCRIBE_PERMISSION);
+        return generateToken(ttl, "/s/s", Util.ALL_FIELD);
     }
 
-    public static String generateToken(int ttl, String subject, String permission) {
-        JSONObject sbjWithOperation = new JSONObject();
-        sbjWithOperation.put(Util.SUBJECT_FIELD, subject);
-        sbjWithOperation.put(Util.OPERATION_FIELD, permission);
-        JSONArray permissions = new JSONArray();
-        permissions.add(sbjWithOperation);
+    public static String generateToken(int ttl, String subject, String field) {
+        Map<String, List<String>> permissions = new HashMap<>();
+        permissions.put(field, Arrays.asList(subject));
 
         String jti =  UUID.randomUUID().toString().substring(0, 6);
         String jws = Jwts.builder()
                 .setId(jti)
-                .claim(Util.PERMISSIONS_FIELD, permissions.toString())
+                .claim(Util.PERMISSIONS_FIELD, permissions)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + (ttl * 1000)))
                 .signWith(signKey).compact();

@@ -47,7 +47,7 @@ public class EventConnectTest {
     public void test_valid_token() {
         EventConnect eventConnect = new EventConnect(new ClientCredentials(validToken, clientAddress));
         tokenAuthorizationHandler.onClientConnect(eventConnect);
-        Assert.assertTrue(eventConnect.getReason() == TOKEN_VALID.getStatus());
+        Assert.assertTrue(eventConnect.getReason() == "TOKEN_VALID");
     }
 
 }

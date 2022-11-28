@@ -1,76 +1,78 @@
 package com.migratorydata.authorization.token;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.migratorydata.authorization.config.Util.*;
-import static com.migratorydata.authorization.token.Permissions.Operation.*;
 
 public class Permissions {
-    private Map<String, Operation> permissions = new HashMap<>();
+    private final Map<String, Permission> permissions = new HashMap<>();
 
     /*
     Here is an example of the payload of a JWT token:
     {
-      "permissions": [
-        {
-          "s": "/server/status",
-          "op": "ps"
-        },
-        {
-          "s": "/demo/notification",
-          "op": "s"
-        },
-        {
-          "s": "/sensor/temp",
-          "op": "p"
-        },
-      ]
+    "permissions": {
+        "sub": [
+          "/demo/notification"
+        ],
+        "pub": [
+          "/sensor/temp"
+        ],
+        "all": [
+          "/server/status"
+        ]
+      }
     }
     */
-    public Permissions(JSONArray permissionClaims) throws Exception {
-        for (Object permissionClaim : permissionClaims) {
-            String subject = (String) ((JSONObject) permissionClaim).get(SUBJECT_FIELD);
-            String operation = (String) ((JSONObject) permissionClaim).get(OPERATION_FIELD);
-
-            if (isSubjectValid(subject) && isOperationValid(operation)) {
-                this.permissions.put(subject, parseOperation(operation));
-            } else {
-                throw new Exception("Invalid syntax of permissions");
+    public Permissions(Map<String, List<String>> permissionClaims) throws Exception {
+        for (Map.Entry<String, List<String>> entry : permissionClaims.entrySet()) {
+            for (String subject : entry.getValue()) {
+                Permission permission = Permission.getPermission(entry.getKey());
+                if (isSubjectValid(subject) && permission != null) {
+                    putPermission(subject, permission);
+                } else {
+                    throw new Exception("Invalid syntax for subject " + subject + ", or permission " + entry.getKey());
+                }
             }
         }
     }
 
-    private Operation parseOperation(String permission) {
-        Operation operation = null;
-        if (PUBLISH_SUBSCRIBE.getCode().equals(permission)) {
-            operation = Operation.PUBLISH_SUBSCRIBE;
-        } else if (SUBSCRIBE.getCode().equals(permission)) {
-            operation = Operation.SUBSCRIBE;
-        } else if (PUBLISH.getCode().equals(permission)) {
-            operation = PUBLISH;
+    private void putPermission(String subject, Permission permission) {
+        if (permissions.containsKey(subject) && permissions.get(subject) != permission) {
+            permissions.put(subject, Permission.ALL);
+        } else {
+            permissions.put(subject, permission);
         }
-        return operation;
     }
 
-    public Operation getOperation(String subject) {
+    public Permission getPermission(String subject) {
         return permissions.get(subject);
     }
 
-    public enum Operation {
-        SUBSCRIBE("s"), PUBLISH("p"), PUBLISH_SUBSCRIBE("ps");
+    public enum Permission {
+        SUB("sub"), PUB("pub"), ALL("all");
 
         private String code;
 
-        Operation(String code) {
+        Permission(String code) {
             this.code = code;
         }
 
         public String getCode() {
             return code;
+        }
+
+        public static Permission getPermission(String code) {
+            Permission Permission = null;
+            if (PUB.getCode().equals(code)) {
+                Permission = PUB;
+            } else if (SUB.getCode().equals(code)) {
+                Permission = SUB;
+            } else if (ALL.getCode().equals(code)) {
+                Permission = ALL;
+            }
+            return Permission;
         }
     }
 }

@@ -1,12 +1,13 @@
 package com.migratorydata.authorization.token;
 
 import com.migratorydata.authorization.config.Util;
+import com.migratorydata.authorization.token.Permissions.Permission;
 import com.migratorydata.extensions.authorization.v2.client.StatusNotification;
 import io.jsonwebtoken.*;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static com.migratorydata.authorization.AuthorizationHandler.TOKEN_EXPIRED;
 import static com.migratorydata.authorization.AuthorizationHandler.TOKEN_INVALID;
@@ -24,7 +25,7 @@ public class Token {
     public boolean parseToken(JwtParser jwtParser) {
         try {
             jwsClaims = jwtParser.parseClaimsJws(token);
-            permissions = new Permissions((JSONArray) new JSONParser().parse((String) jwsClaims.getBody().get(Util.PERMISSIONS_FIELD)));
+            permissions = new Permissions((Map<String, List<String>>) jwsClaims.getBody().get(Util.PERMISSIONS_FIELD));
         } catch (MalformedJwtException e1) {
             e1.printStackTrace();
             errorNotification = TOKEN_INVALID;
@@ -43,16 +44,16 @@ public class Token {
     }
 
     public boolean authorizeSubscribe(String topic) {
-        Permissions.Operation operation = permissions.getOperation(topic);
-        if (operation != null && (operation == Permissions.Operation.SUBSCRIBE || operation == Permissions.Operation.PUBLISH_SUBSCRIBE)) {
+        Permission permission = permissions.getPermission(topic);
+        if (permission != null && (permission == Permission.SUB || permission == Permission.ALL)) {
             return true;
         }
         return false;
     }
 
     public boolean authorizePublish(String topic) {
-        Permissions.Operation operation = permissions.getOperation(topic);
-        if (operation != null && (operation == Permissions.Operation.PUBLISH || operation == Permissions.Operation.PUBLISH_SUBSCRIBE)) {
+        Permission permission = permissions.getPermission(topic);
+        if (permission != null && (permission == Permission.PUB || permission == Permission.ALL)) {
             return true;
         }
         return false;

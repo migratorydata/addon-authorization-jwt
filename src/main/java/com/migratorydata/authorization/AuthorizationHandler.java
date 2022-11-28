@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AuthorizationHandler implements MigratoryDataAuthorizationListener {
-    public static final StatusNotification TOKEN_VALID = new StatusNotification("NOTIFY_TOKEN_VALID", "NOTIFY_TOKEN_VALID");
+
     public static final StatusNotification TOKEN_EXPIRED = new StatusNotification("NOTIFY_TOKEN_EXPIRED", "NOTIFY_TOKEN_EXPIRED");
     public static final StatusNotification TOKEN_TO_EXPIRE = new StatusNotification("NOTIFY_TOKEN_TO_EXPIRE", "NOTIFY_TOKEN_TO_EXPIRE");
     public static final StatusNotification TOKEN_INVALID = new StatusNotification("NOTIFY_TOKEN_INVALID", "NOTIFY_TOKEN_INVALID");
@@ -52,7 +52,7 @@ public class AuthorizationHandler implements MigratoryDataAuthorizationListener 
             Session session = new Session(eventConnect.getClient(), token);
             sessions.put(session.getClientAddress(), session);
             tokenExpirationHandler.add(session);
-            eventConnect.authorize(true, TOKEN_VALID.getStatus());
+            eventConnect.authorize(true, "TOKEN_VALID");
         } else {
             eventConnect.authorize(false, token.getErrorNotification().getStatus());
         }

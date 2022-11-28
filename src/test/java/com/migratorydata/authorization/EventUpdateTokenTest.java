@@ -53,7 +53,7 @@ public class EventUpdateTokenTest {
         EventConnect connectRequest = new EventConnect(new ClientCredentials(validToken, clientAddress));
         tokenAuthorizationHandler.onClientConnect(connectRequest);
 
-        Assert.assertTrue(connectRequest.getReason() == TOKEN_VALID.getStatus());
+        Assert.assertTrue(connectRequest.getReason() == "TOKEN_VALID");
 
         ClientCredentials clientCredentials = new ClientCredentials(validToken, clientAddress);
         EventUpdate updateRequest = new EventUpdate(clientCredentials);
