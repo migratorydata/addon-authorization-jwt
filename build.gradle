@@ -14,7 +14,7 @@ repositories {
 shadowJar {
     archiveBaseName.set('authorization')
     archiveClassifier.set('')
-    archiveVersion.set('1.0.0')
+    archiveVersion.set('')
 
     mergeServiceFiles {
         include 'META-INF/services/*'
