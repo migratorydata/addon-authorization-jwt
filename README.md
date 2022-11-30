@@ -43,12 +43,12 @@ $ ./gradlew clean build shadowJar
 
 #### Deploying the modified add-on
 
-1. Copy the modified add-on from `addon-authorization-jwt/extensions/authorization.jar` to the following location of your MigratoryData server installation:
+1. Copy the modified add-on from `addon-authorization-jwt/build/libs/authorization.jar` to the following location of your MigratoryData server installation:
 
 | Location                          | Package type                         |
 |-----------------------------------|--------------------------------------|
 | `extensions/`                     | Platform-independent tarball package |
-| `/etc/migratorydata/extensions/`  | `RPM` or `DEB` Linux package         |
+| `/usr/share/migratorydata/extensions/`  | `RPM` or `DEB` Linux package         |
 
 > **Note &mdash;**
 > It is not necessary to delete the JWT authorization add-on `authorization.jar` made available under the folder `addons`. Loading a custom authorization extension
