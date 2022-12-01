@@ -45,7 +45,7 @@ public class AuthorizationHandler implements MigratoryDataAuthorizationListener 
 
     @Override
     public void onClientConnect(EventConnect eventConnect) {
-        System.out.println("onClientConnect - " + eventConnect);
+        // System.out.println("onClientConnect - " + eventConnect);
 
         Token token = new Token(eventConnect.getClient().getToken());
         if (token.parseToken(jwtVerifyParser)) {
@@ -60,7 +60,7 @@ public class AuthorizationHandler implements MigratoryDataAuthorizationListener 
 
     @Override
     public void onClientUpdateToken(EventUpdateToken eventUpdateToken) {
-        System.out.println("onClientUpdateToken - " + eventUpdateToken);
+        // System.out.println("onClientUpdateToken - " + eventUpdateToken);
 
         Token token = new Token(eventUpdateToken.getClient().getToken());
         if (token.parseToken(jwtVerifyParser)) {
@@ -78,7 +78,7 @@ public class AuthorizationHandler implements MigratoryDataAuthorizationListener 
 
     @Override
     public void onClientSubscribe(EventSubscribe eventSubscribe) {
-        System.out.println("onClientSubscribe - " + eventSubscribe);
+        // System.out.println("onClientSubscribe - " + eventSubscribe);
 
         Map<String, Boolean> permissions = new HashMap<String, Boolean>();
         Session session = sessions.get(eventSubscribe.getClient().getClientAddress());
@@ -92,7 +92,7 @@ public class AuthorizationHandler implements MigratoryDataAuthorizationListener 
 
     @Override
     public void onClientPublish(EventPublish eventPublish) {
-        System.out.println("onClientPublish - " + eventPublish);
+        // System.out.println("onClientPublish - " + eventPublish);
 
         boolean permission = false;
         Session session = sessions.get(eventPublish.getClient().getClientAddress());
@@ -107,7 +107,7 @@ public class AuthorizationHandler implements MigratoryDataAuthorizationListener 
 
     @Override
     public void onClientDisconnect(EventDisconnect eventDisconnect) {
-        System.out.println("onClientDisconnect - " + eventDisconnect);
+        // System.out.println("onClientDisconnect - " + eventDisconnect);
 
         Session session = sessions.remove(eventDisconnect.getClient().getClientAddress());
         if (session != null) {
@@ -117,11 +117,11 @@ public class AuthorizationHandler implements MigratoryDataAuthorizationListener 
 
     @Override
     public void onInit() {
-        System.out.println("onInit");
+        System.out.println("onInit: JWT Authorization Addon");
     }
 
     @Override
     public void onDispose() {
-        System.out.println("onDispose");
+        System.out.println("onDispose: JWT Authorization Addon");
     }
 }
