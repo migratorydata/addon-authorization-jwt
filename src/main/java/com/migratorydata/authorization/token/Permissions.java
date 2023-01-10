@@ -1,13 +1,12 @@
 package com.migratorydata.authorization.token;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.migratorydata.authorization.config.Util.*;
 
 public class Permissions {
-    private final Map<String, Permission> permissions = new HashMap<>();
+    private final SubjectPermission permissions = new SubjectPermission("");
 
     /*
     Here is an example of the payload of a JWT token:
@@ -20,7 +19,8 @@ public class Permissions {
           "/sensor/temp"
         ],
         "all": [
-          "/server/status"
+          "/server/status",
+          "/sensors/*"
         ]
       }
     }
@@ -29,7 +29,7 @@ public class Permissions {
         for (Map.Entry<String, List<String>> entry : permissionClaims.entrySet()) {
             for (String subject : entry.getValue()) {
                 Permission permission = Permission.getPermission(entry.getKey());
-                if (isSubjectValid(subject) && permission != null) {
+                if (isSubjectValid(subject) && permission != Permission.NONE) {
                     putPermission(subject, permission);
                 } else {
                     throw new Exception("Invalid syntax for subject " + subject + ", or permission " + entry.getKey());
@@ -39,19 +39,15 @@ public class Permissions {
     }
 
     private void putPermission(String subject, Permission permission) {
-        if (permissions.containsKey(subject) && permissions.get(subject) != permission) {
-            permissions.put(subject, Permission.ALL);
-        } else {
-            permissions.put(subject, permission);
-        }
+        permissions.setPermission(subject, permission);
     }
 
     public Permission getPermission(String subject) {
-        return permissions.get(subject);
+        return permissions.getPermission(subject);
     }
 
     public enum Permission {
-        SUB("sub"), PUB("pub"), ALL("all");
+        NONE("none"), SUB("sub"), PUB("pub"), ALL("all");
 
         private String code;
 
@@ -64,15 +60,15 @@ public class Permissions {
         }
 
         public static Permission getPermission(String code) {
-            Permission Permission = null;
+            Permission permission = NONE;
             if (PUB.getCode().equals(code)) {
-                Permission = PUB;
+                permission = PUB;
             } else if (SUB.getCode().equals(code)) {
-                Permission = SUB;
+                permission = SUB;
             } else if (ALL.getCode().equals(code)) {
-                Permission = ALL;
-            }
-            return Permission;
+                permission = ALL;
+            } 
+            return permission;
         }
     }
 }

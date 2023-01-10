@@ -26,6 +26,9 @@ public class EventPublishTest {
     // subject /s/s has permission for subscribe
     private String validTokenWithSubscribePermission = generateToken(100, subject, Util.SUB_FIELD);
 
+    // subject /* has permission for ALL
+    private String validTokenWithWildcardPermission = generateToken(100, "/*", Util.ALL_FIELD);
+
     @After
     public void onDispose() {
         tokenAuthorizationHandler.onDispose();
@@ -109,6 +112,19 @@ public class EventPublishTest {
         tokenAuthorizationHandler.onClientPublish(eventPublish);
 
         Assert.assertFalse(eventPublish.getPermission());
+    }
+
+    @Test
+    public void test_wildcard_token_with_all_permission() {
+        ClientCredentials clientCredentials = new ClientCredentials(validTokenWithWildcardPermission, clientAddress);
+
+        EventConnect eventConnect = new EventConnect(clientCredentials);
+        tokenAuthorizationHandler.onClientConnect(eventConnect);
+
+        EventPublish eventPublish = new EventPublish(clientCredentials, subject);
+        tokenAuthorizationHandler.onClientPublish(eventPublish);
+
+        Assert.assertTrue(eventPublish.getPermission());
     }
 
 }
