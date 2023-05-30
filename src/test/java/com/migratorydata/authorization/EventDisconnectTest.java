@@ -1,9 +1,13 @@
 package com.migratorydata.authorization;
 
+import com.migratorydata.authorization.common.config.Configuration;
+import com.migratorydata.authorization.def.DefaultAuthorizationHandler;
 import com.migratorydata.authorization.helper.ClientCredentials;
 import com.migratorydata.authorization.helper.EventDisconnect;
+import com.migratorydata.extensions.authorization.v2.MigratoryDataAuthorizationListener;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class EventDisconnectTest {
@@ -12,17 +16,28 @@ public class EventDisconnectTest {
     // authorization.security.secret_key=nR7Xgg5+DV9kIqNyynwv5dtLeAM97cBcBewW8pr0DMc
     private String clientAddress = "127.0.0.1:35274";
 
-    private AuthorizationHandler tokenAuthorizationHandler = new AuthorizationHandler();
+    protected MigratoryDataAuthorizationListener authorizationListener;
+
+    @Before
+    public void onStart() {
+        initialize();
+    }
+
+    protected void initialize() {
+        Configuration conf = Configuration.getConfiguration();
+        authorizationListener = new DefaultAuthorizationHandler(conf.getMillisBeforeRenewal(), conf.getJwtVerifyParser());
+    }
+
 
     @After
     public void onDispose() {
-        tokenAuthorizationHandler.onDispose();
+        authorizationListener.onDispose();
     }
 
     @Test
     public void test() {
         EventDisconnect eventDisconnect = new EventDisconnect(new ClientCredentials(null, clientAddress));
-        tokenAuthorizationHandler.onClientDisconnect(eventDisconnect);
+        authorizationListener.onClientDisconnect(eventDisconnect);
         Assert.assertTrue(true);
     }
 

@@ -1,7 +1,6 @@
-package com.migratorydata.authorization.token;
+package com.migratorydata.authorization.common.token;
 
-import com.migratorydata.authorization.config.Util;
-import com.migratorydata.authorization.token.Permissions.Permission;
+import com.migratorydata.authorization.common.config.Util;
 import com.migratorydata.extensions.authorization.v2.client.StatusNotification;
 import io.jsonwebtoken.*;
 
@@ -9,14 +8,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.migratorydata.authorization.AuthorizationHandler.TOKEN_EXPIRED;
-import static com.migratorydata.authorization.AuthorizationHandler.TOKEN_INVALID;
+import static com.migratorydata.authorization.def.DefaultAuthorizationHandler.TOKEN_EXPIRED;
+import static com.migratorydata.authorization.def.DefaultAuthorizationHandler.TOKEN_INVALID;
 
 public class Token {
     private final String token;
     private StatusNotification errorNotification = null;
     private Jws<Claims> jwsClaims = null;
     private Permissions permissions = null;
+
+    private String appId;
 
     public Token(String token) {
         this.token = token;
@@ -26,6 +27,9 @@ public class Token {
         try {
             jwsClaims = jwtParser.parseClaimsJws(token);
             permissions = new Permissions((Map<String, List<String>>) jwsClaims.getBody().get(Util.PERMISSIONS_FIELD));
+            if (jwsClaims.getBody().containsKey(Util.APPID_FIELD)) {
+                appId = (String) jwsClaims.getBody().get(Util.APPID_FIELD);
+            }
         } catch (MalformedJwtException e1) {
             e1.printStackTrace();
             errorNotification = TOKEN_INVALID;
@@ -44,22 +48,22 @@ public class Token {
     }
 
     public boolean authorizeSubscribe(String topic) {
-        Permission permission = permissions.getPermission(topic);
-        if (permission != null && (permission == Permission.SUB || permission == Permission.ALL)) {
+        Permissions.Permission permission = permissions.getPermission(topic);
+        if (permission != null && (permission == Permissions.Permission.SUB || permission == Permissions.Permission.ALL)) {
             return true;
         }
         return false;
     }
 
     public boolean authorizePublish(String topic) {
-        Permission permission = permissions.getPermission(topic);
-        if (permission != null && (permission == Permission.PUB || permission == Permission.ALL)) {
+        Permissions.Permission permission = permissions.getPermission(topic);
+        if ((permission == Permissions.Permission.PUB || permission == Permissions.Permission.ALL)) {
             return true;
         }
         return false;
     }
 
-    public boolean isTimeToRenew(int millisBeforeRenewal) {
+    public boolean isTimeToRenew(long millisBeforeRenewal) {
         Date currentTime = new Date();
         long currentTimeMillis = currentTime.getTime();
         Date time = new Date(currentTimeMillis + millisBeforeRenewal);
@@ -67,6 +71,14 @@ public class Token {
             return true;
         }
         return false;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public String getId() {
+        return jwsClaims.getBody().getId();
     }
 
     public Date getExpirationTime() {

@@ -1,5 +1,7 @@
 package com.migratorydata.authorization.token;
 
+import com.migratorydata.authorization.common.token.Permissions;
+import com.migratorydata.authorization.common.token.SubjectPermission;
 import org.junit.Assert;
 import org.junit.Test;
 

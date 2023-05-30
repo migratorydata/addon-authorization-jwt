@@ -1,9 +1,9 @@
-package com.migratorydata.authorization.token;
+package com.migratorydata.authorization.common.token;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.migratorydata.authorization.config.Util.*;
+import static com.migratorydata.authorization.common.config.Util.*;
 
 public class Permissions {
     private final SubjectPermission permissions = new SubjectPermission("");

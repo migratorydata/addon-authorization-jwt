@@ -1,20 +1,16 @@
-package com.migratorydata.authorization;
+package com.migratorydata.authorization.def;
 
-import com.migratorydata.authorization.client.Session;
-import com.migratorydata.authorization.token.Token;
-import com.migratorydata.authorization.token.TokenExpirationHandler;
-import com.migratorydata.authorization.config.Configuration;
+import com.migratorydata.authorization.common.client.Session;
+import com.migratorydata.authorization.common.token.Token;
+import com.migratorydata.authorization.common.token.TokenExpirationHandler;
 import com.migratorydata.extensions.authorization.v2.*;
 import com.migratorydata.extensions.authorization.v2.client.*;
 import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class AuthorizationHandler implements MigratoryDataAuthorizationListener {
+public class DefaultAuthorizationHandler implements MigratoryDataAuthorizationListener {
 
     public static final StatusNotification TOKEN_EXPIRED = new StatusNotification("NOTIFY_TOKEN_EXPIRED", "NOTIFY_TOKEN_EXPIRED");
     public static final StatusNotification TOKEN_TO_EXPIRE = new StatusNotification("NOTIFY_TOKEN_TO_EXPIRE", "NOTIFY_TOKEN_TO_EXPIRE");
@@ -23,24 +19,12 @@ public class AuthorizationHandler implements MigratoryDataAuthorizationListener 
 
     private final Map<String, Session> sessions = new HashMap<>();
     private final TokenExpirationHandler tokenExpirationHandler;
-    private JwtParser jwtVerifyParser;
+    private final JwtParser jwtVerifyParser;
 
-    public AuthorizationHandler() {
-        Configuration conf = Configuration.getConfiguration();
-        tokenExpirationHandler = new TokenExpirationHandler(conf.getMillisBeforeRenewal());
+    public DefaultAuthorizationHandler(long millisBeforeRenewal, JwtParser jwtVerifyParser) {
+        this.jwtVerifyParser = jwtVerifyParser;
 
-        if ("hmac".equals(conf.getSignatureType())) {
-            jwtVerifyParser = Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(conf.getHMACSecretKey()))).build();
-        } else if ("rsa".equals(conf.getSignatureType())){
-            try {
-                jwtVerifyParser = Jwts.parserBuilder().setSigningKey(conf.getRSAPublicKey()).build();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.err.println("Invalid signature type, check the parameter 'signature.type'");
-            System.exit(98);
-        }
+        tokenExpirationHandler = new TokenExpirationHandler(millisBeforeRenewal);
     }
 
     @Override

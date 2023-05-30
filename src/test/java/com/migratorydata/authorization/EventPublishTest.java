@@ -1,18 +1,22 @@
 package com.migratorydata.authorization;
 
-import com.migratorydata.authorization.config.Util;
+import com.migratorydata.authorization.common.config.Configuration;
+import com.migratorydata.authorization.common.config.Util;
+import com.migratorydata.authorization.def.DefaultAuthorizationHandler;
 import com.migratorydata.authorization.helper.ClientCredentials;
 import com.migratorydata.authorization.helper.EventConnect;
 import com.migratorydata.authorization.helper.EventPublish;
+import com.migratorydata.extensions.authorization.v2.MigratoryDataAuthorizationListener;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import static com.migratorydata.authorization.token.SessionOrderTest.generateToken;
 
 public class EventPublishTest {
 
-    private AuthorizationHandler tokenAuthorizationHandler = new AuthorizationHandler();
+    protected MigratoryDataAuthorizationListener authorizationListener;
     private String clientAddress = "127.0.0.1:35274";
     private String subject = "/s/s";
     private String expiredToken = generateToken(-100);
@@ -29,9 +33,20 @@ public class EventPublishTest {
     // subject /* has permission for ALL
     private String validTokenWithWildcardPermission = generateToken(100, "/*", Util.ALL_FIELD);
 
+    @Before
+    public void onStart() {
+        initialize();
+    }
+
+    protected void initialize() {
+        Configuration conf = Configuration.getConfiguration();
+        authorizationListener = new DefaultAuthorizationHandler(conf.getMillisBeforeRenewal(), conf.getJwtVerifyParser());
+    }
+
+
     @After
     public void onDispose() {
-        tokenAuthorizationHandler.onDispose();
+        authorizationListener.onDispose();
     }
 
     @Test
@@ -39,10 +54,10 @@ public class EventPublishTest {
         ClientCredentials clientCredentials = new ClientCredentials(null, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventPublish eventPublish = new EventPublish(clientCredentials, subject);
-        tokenAuthorizationHandler.onClientPublish(eventPublish);
+        authorizationListener.onClientPublish(eventPublish);
 
         Assert.assertFalse(eventPublish.getPermission());
     }
@@ -52,10 +67,10 @@ public class EventPublishTest {
         ClientCredentials clientCredentials = new ClientCredentials(expiredToken, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventPublish eventPublish = new EventPublish(clientCredentials, subject);
-        tokenAuthorizationHandler.onClientPublish(eventPublish);
+        authorizationListener.onClientPublish(eventPublish);
 
         Assert.assertFalse(eventPublish.getPermission());
     }
@@ -65,10 +80,10 @@ public class EventPublishTest {
         ClientCredentials clientCredentials = new ClientCredentials(validToken, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventPublish eventPublish = new EventPublish(clientCredentials, subject);
-        tokenAuthorizationHandler.onClientPublish(eventPublish);
+        authorizationListener.onClientPublish(eventPublish);
 
         Assert.assertTrue(eventPublish.getPermission());
     }
@@ -80,10 +95,10 @@ public class EventPublishTest {
         ClientCredentials clientCredentials = new ClientCredentials(validToken, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventPublish eventPublish = new EventPublish(clientCredentials, subjectWithoutPermission);
-        tokenAuthorizationHandler.onClientPublish(eventPublish);
+        authorizationListener.onClientPublish(eventPublish);
 
         Assert.assertFalse(eventPublish.getPermission());
     }
@@ -93,10 +108,10 @@ public class EventPublishTest {
         ClientCredentials clientCredentials = new ClientCredentials(validTokenWithPublishPermission, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventPublish eventPublish = new EventPublish(clientCredentials, subject);
-        tokenAuthorizationHandler.onClientPublish(eventPublish);
+        authorizationListener.onClientPublish(eventPublish);
 
         Assert.assertTrue(eventPublish.getPermission());
     }
@@ -106,10 +121,10 @@ public class EventPublishTest {
         ClientCredentials clientCredentials = new ClientCredentials(validTokenWithSubscribePermission, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventPublish eventPublish = new EventPublish(clientCredentials, subject);
-        tokenAuthorizationHandler.onClientPublish(eventPublish);
+        authorizationListener.onClientPublish(eventPublish);
 
         Assert.assertFalse(eventPublish.getPermission());
     }
@@ -119,10 +134,10 @@ public class EventPublishTest {
         ClientCredentials clientCredentials = new ClientCredentials(validTokenWithWildcardPermission, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventPublish eventPublish = new EventPublish(clientCredentials, subject);
-        tokenAuthorizationHandler.onClientPublish(eventPublish);
+        authorizationListener.onClientPublish(eventPublish);
 
         Assert.assertTrue(eventPublish.getPermission());
     }

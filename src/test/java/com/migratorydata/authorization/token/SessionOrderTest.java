@@ -1,7 +1,9 @@
 package com.migratorydata.authorization.token;
 
-import com.migratorydata.authorization.client.Session;
-import com.migratorydata.authorization.config.Util;
+import com.migratorydata.authorization.common.client.Session;
+import com.migratorydata.authorization.common.token.Token;
+import com.migratorydata.authorization.common.token.TokenExpirationHandler;
+import com.migratorydata.authorization.common.config.Util;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

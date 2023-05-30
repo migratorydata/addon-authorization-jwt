@@ -1,14 +1,20 @@
-package com.migratorydata.authorization.client;
+package com.migratorydata.authorization.common.client;
 
-import com.migratorydata.authorization.token.Token;
+import com.migratorydata.authorization.common.token.Token;
 import com.migratorydata.extensions.authorization.v2.client.Client;
 import com.migratorydata.extensions.authorization.v2.client.StatusNotification;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Session {
     private Client client;
     private Token token;
     private volatile boolean tokenRenewalStarted = false;
     private long tokenRenewalTimestamp;
+
+    private Set<String> subjects = new HashSet<>();
 
     public Session(Client client, Token token) {
         this.client = client;
@@ -53,5 +59,13 @@ public class Session {
 
     public void disconnect() {
         client.disconnect();
+    }
+
+    public void setSubscribeSubject(String subject) {
+        subjects.add(subject);
+    }
+
+    public Collection<String> getSubscribeSubjects() {
+        return subjects;
     }
 }

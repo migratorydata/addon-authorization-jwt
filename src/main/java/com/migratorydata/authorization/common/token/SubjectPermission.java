@@ -1,4 +1,4 @@
-package com.migratorydata.authorization.token;
+package com.migratorydata.authorization.common.token;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +43,8 @@ public class SubjectPermission {
             segment = subject;
             subject = null;
         }
-        if (segment.equals("*")) {
+        if (segment.equals("*") || segment.matches("^\\{\\w+}$")) {
+            segment = "*";
             descendants.clear();
 
             SubjectPermission subjectPermission = new SubjectPermission(getName() + "/" + segment, permission, SegmentType.WILDCARD);

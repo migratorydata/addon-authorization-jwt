@@ -1,6 +1,6 @@
-package com.migratorydata.authorization.token;
+package com.migratorydata.authorization.common.token;
 
-import com.migratorydata.authorization.client.Session;
+import com.migratorydata.authorization.common.client.Session;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -9,15 +9,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.migratorydata.authorization.AuthorizationHandler.TOKEN_TO_EXPIRE;
+import static com.migratorydata.authorization.def.DefaultAuthorizationHandler.TOKEN_TO_EXPIRE;
 
 public class TokenExpirationHandler {
     private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private final TreeSet<Session> sessions = new TreeSet<>(new SessionOrderByExpirationTime());
     private final TreeSet<Session> disconnectSessions = new TreeSet<>(new SessionOrderByTokenRenewalTimestamp());
-    private final int millisBeforeRenewal;
+    private final long millisBeforeRenewal;
 
-    public TokenExpirationHandler(int millisBeforeRenewal) {
+    public TokenExpirationHandler(long millisBeforeRenewal) {
         this.millisBeforeRenewal = millisBeforeRenewal;
 
         executor.scheduleAtFixedRate(() -> {

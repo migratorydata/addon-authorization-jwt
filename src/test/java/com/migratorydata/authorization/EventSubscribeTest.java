@@ -1,11 +1,15 @@
 package com.migratorydata.authorization;
 
-import com.migratorydata.authorization.config.Util;
+import com.migratorydata.authorization.common.config.Configuration;
+import com.migratorydata.authorization.common.config.Util;
+import com.migratorydata.authorization.def.DefaultAuthorizationHandler;
 import com.migratorydata.authorization.helper.ClientCredentials;
 import com.migratorydata.authorization.helper.EventConnect;
 import com.migratorydata.authorization.helper.EventSubscribe;
+import com.migratorydata.extensions.authorization.v2.MigratoryDataAuthorizationListener;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -14,7 +18,7 @@ import static com.migratorydata.authorization.token.SessionOrderTest.generateTok
 
 public class EventSubscribeTest {
 
-    private AuthorizationHandler tokenAuthorizationHandler = new AuthorizationHandler();
+    protected MigratoryDataAuthorizationListener authorizationListener;
     private String clientAddress = "127.0.0.1:35274";
     private String subject = "/s/s";
     private String expiredToken = generateToken(-100);
@@ -28,9 +32,20 @@ public class EventSubscribeTest {
     // subject /s/s has permission for subscribe
     private String validTokenWithSubscribePermission = generateToken(100, subject, Util.SUB_FIELD);
 
+    @Before
+    public void onStart() {
+        initialize();
+    }
+
+    protected void initialize() {
+        Configuration conf = Configuration.getConfiguration();
+        authorizationListener = new DefaultAuthorizationHandler(conf.getMillisBeforeRenewal(), conf.getJwtVerifyParser());
+    }
+
+
     @After
     public void onDispose() {
-        tokenAuthorizationHandler.onDispose();
+        authorizationListener.onDispose();
     }
 
     @Test
@@ -38,10 +53,10 @@ public class EventSubscribeTest {
         ClientCredentials clientCredentials = new ClientCredentials(null, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventSubscribe eventSubscribe = new EventSubscribe(clientCredentials, Arrays.asList(subject));
-        tokenAuthorizationHandler.onClientSubscribe(eventSubscribe);
+        authorizationListener.onClientSubscribe(eventSubscribe);
 
         Assert.assertNull(eventSubscribe.getPermissions().get(subject));
     }
@@ -51,10 +66,10 @@ public class EventSubscribeTest {
         ClientCredentials clientCredentials = new ClientCredentials(expiredToken, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventSubscribe eventSubscribe = new EventSubscribe(clientCredentials, Arrays.asList(subject));
-        tokenAuthorizationHandler.onClientSubscribe(eventSubscribe);
+        authorizationListener.onClientSubscribe(eventSubscribe);
 
         Assert.assertNull(eventSubscribe.getPermissions().get(subject));
     }
@@ -64,10 +79,10 @@ public class EventSubscribeTest {
         ClientCredentials clientCredentials = new ClientCredentials(validToken, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventSubscribe eventSubscribe = new EventSubscribe(clientCredentials, Arrays.asList(subject));
-        tokenAuthorizationHandler.onClientSubscribe(eventSubscribe);
+        authorizationListener.onClientSubscribe(eventSubscribe);
 
         Assert.assertTrue(eventSubscribe.getPermissions().get(subject));
     }
@@ -79,10 +94,10 @@ public class EventSubscribeTest {
         ClientCredentials clientCredentials = new ClientCredentials(validToken, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventSubscribe eventSubscribe = new EventSubscribe(clientCredentials, Arrays.asList(subjectWithoutPermission));
-        tokenAuthorizationHandler.onClientSubscribe(eventSubscribe);
+        authorizationListener.onClientSubscribe(eventSubscribe);
 
         Assert.assertFalse(eventSubscribe.getPermissions().get(subjectWithoutPermission));
     }
@@ -92,10 +107,10 @@ public class EventSubscribeTest {
         ClientCredentials clientCredentials = new ClientCredentials(validTokenWithPublishPermission, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventSubscribe eventSubscribe = new EventSubscribe(clientCredentials, Arrays.asList(subject));
-        tokenAuthorizationHandler.onClientSubscribe(eventSubscribe);
+        authorizationListener.onClientSubscribe(eventSubscribe);
 
         Assert.assertFalse(eventSubscribe.getPermissions().get(subject));
     }
@@ -105,10 +120,10 @@ public class EventSubscribeTest {
         ClientCredentials clientCredentials = new ClientCredentials(validTokenWithSubscribePermission, clientAddress);
 
         EventConnect eventConnect = new EventConnect(clientCredentials);
-        tokenAuthorizationHandler.onClientConnect(eventConnect);
+        authorizationListener.onClientConnect(eventConnect);
 
         EventSubscribe eventSubscribe = new EventSubscribe(clientCredentials, Arrays.asList(subject));
-        tokenAuthorizationHandler.onClientSubscribe(eventSubscribe);
+        authorizationListener.onClientSubscribe(eventSubscribe);
 
         Assert.assertTrue(eventSubscribe.getPermissions().get(subject));
     }

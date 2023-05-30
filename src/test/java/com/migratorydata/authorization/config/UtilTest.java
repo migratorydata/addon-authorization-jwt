@@ -1,5 +1,6 @@
 package com.migratorydata.authorization.config;
 
+import com.migratorydata.authorization.common.config.Util;
 import org.junit.Assert;
 import org.junit.Test;
 
