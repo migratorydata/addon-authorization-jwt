@@ -10,7 +10,7 @@ public class EventBase {
     protected MigratoryDataAuthorizationListener authorizationListener;
 
     protected void initialize() {
-        int numberOfClusterMembers = Integer.parseInt(System.getProperty("com.migratorydata.extensions.authorization.clusterMembers", "1"));
+        int numberOfClusterMembers = System.getProperty("com.migratorydata.extensions.authorization.clusterMembers", "1").split(",").length;
 
         Configuration conf = Configuration.getConfiguration();
 

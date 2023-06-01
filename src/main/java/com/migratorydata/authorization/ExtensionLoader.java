@@ -17,7 +17,7 @@ public class ExtensionLoader implements MigratoryDataAuthorizationListener {
     private Producer producer;
 
     public ExtensionLoader() {
-        int numberOfClusterMembers = Integer.parseInt(System.getProperty("com.migratorydata.extensions.authorization.clusterMembers", "1"));
+        int numberOfClusterMembers = System.getProperty("com.migratorydata.extensions.authorization.clusterMembers", "1").split(",").length;
 
         Configuration conf = Configuration.getConfiguration();
 
