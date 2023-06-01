@@ -1,24 +1,33 @@
 package com.migratorydata.authorization.hub;
 
-import com.migratorydata.authorization.common.config.Configuration;
+import com.migratorydata.authorization.helper.ClientCredentials;
+import com.migratorydata.authorization.helper.EventDisconnect;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-import com.migratorydata.authorization.hub.common.CommonUtils;
-import com.migratorydata.authorization.hub.common.Producer;
+public class EventDisconnectTest extends EventBase {
 
-public class EventDisconnectTest extends com.migratorydata.authorization.EventDisconnectTest {
+    // Tokens are generated with demo key from configuration file
+    // authorization.security.secret_key=nR7Xgg5+DV9kIqNyynwv5dtLeAM97cBcBewW8pr0DMc
+    private String clientAddress = "127.0.0.1:35274";
 
-    @Override
-    protected void initialize() {
-        Configuration conf = Configuration.getConfiguration();
+    @Before
+    public void onStart() {
+        initialize();
+    }
 
-        String jws = CommonUtils.generateToken(conf.getApiSegment(),
-                CommonUtils.createAllPermissions("/" + conf.getAdminUserSegment() + "/" + conf.getApiSegment() + "/*"),
-                conf.getSecretKey());
+    @After
+    public void onDispose() {
+        authorizationListener.onDispose();
+    }
 
-        Producer producer = new Producer(conf.getClusterInternalServers(), jws);
-
-        authorizationListener = new HubAuthorizationHandler(producer, conf.getSubjectStats(), conf.getClusterServerId(),
-                conf.getMillisBeforeRenewal(), conf.getJwtVerifyParser(), conf.getUrlRevokedTokens(), conf.getUrlApiLimits());
+    @Test
+    public void test() {
+        EventDisconnect eventDisconnect = new EventDisconnect(new ClientCredentials(null, clientAddress));
+        authorizationListener.onClientDisconnect(eventDisconnect);
+        Assert.assertTrue(true);
     }
 
 }

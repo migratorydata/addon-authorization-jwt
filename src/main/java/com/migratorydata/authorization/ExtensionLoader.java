@@ -1,7 +1,6 @@
 package com.migratorydata.authorization;
 
 import com.migratorydata.authorization.common.config.Configuration;
-import com.migratorydata.authorization.def.DefaultAuthorizationHandler;
 import com.migratorydata.authorization.hub.HubAuthorizationHandler;
 import com.migratorydata.authorization.hub.PushConsumerListener;
 import com.migratorydata.authorization.hub.common.CommonUtils;
@@ -18,23 +17,22 @@ public class ExtensionLoader implements MigratoryDataAuthorizationListener {
     private Producer producer;
 
     public ExtensionLoader() {
+        int numberOfClusterMembers = Integer.parseInt(System.getProperty("com.migratorydata.extensions.authorization.clusterMembers", "1"));
+
         Configuration conf = Configuration.getConfiguration();
 
-        if (conf.hubExtensionEnabled()) {
-            String jws = CommonUtils.generateToken(conf.getApiSegment(),
-                    CommonUtils.createAllPermissions("/" + conf.getAdminUserSegment() + "/" + conf.getApiSegment() + "/*"),
-                    conf.getSecretKey());
+        String jws = CommonUtils.generateToken(conf.getApiSegment(),
+                CommonUtils.createAllPermissions("/" + conf.getAdminUserSegment() + "/" + conf.getApiSegment() + "/*"),
+                conf.getSecretKey());
 
-            producer = new Producer(conf.getClusterInternalServers(), jws);
+        producer = new Producer(conf.getClusterInternalServers(), jws);
 
-            authorizationListener = new HubAuthorizationHandler(producer, conf.getSubjectStats(), conf.getClusterServerId(),
-                    conf.getMillisBeforeRenewal(), conf.getJwtVerifyParser(), conf.getUrlRevokedTokens(), conf.getUrlApiLimits());
+        authorizationListener = new HubAuthorizationHandler(producer, conf.getSubjectStats(), conf.getClusterServerId(),
+                conf.getMillisBeforeRenewal(), conf.getJwtVerifyParser(), conf.getUrlRevokedTokens(), conf.getUrlApiLimits(),
+                numberOfClusterMembers);
 
-            consumer = new Consumer(conf.getClusterInternalServers(), jws, conf.getSubjectStats(), new PushConsumerListener((HubAuthorizationHandler) authorizationListener));
-            consumer.begin();
-        } else {
-            authorizationListener = new DefaultAuthorizationHandler(conf.getMillisBeforeRenewal(), conf.getJwtVerifyParser());
-        }
+        consumer = new Consumer(conf.getClusterInternalServers(), jws, conf.getSubjectStats(), new PushConsumerListener((HubAuthorizationHandler) authorizationListener));
+        consumer.begin();
     }
 
     @Override

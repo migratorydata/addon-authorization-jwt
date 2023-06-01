@@ -48,9 +48,9 @@ public class HubAuthorizationHandler implements MigratoryDataAuthorizationListen
     private final String urlApiLimits;
 
     public HubAuthorizationHandler(Producer producer, String topicStats, String serverName, long millisBeforeRenewal,
-                                   JwtParser jwtVerifyParser, String urlRevokedTokens, String urlApiLimits) {
+                                   JwtParser jwtVerifyParser, String urlRevokedTokens, String urlApiLimits, int numberOfClusterMembers) {
 
-        this.limitsAgregationHandler = new LimitsAgregationHandler(producer, serverName, topicStats);
+        this.limitsAgregationHandler = new LimitsAgregationHandler(producer, serverName, topicStats, numberOfClusterMembers);
 
         this.tokenExpirationHandler = new TokenExpirationHandler(millisBeforeRenewal);
 

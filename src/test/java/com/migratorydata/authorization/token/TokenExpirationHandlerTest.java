@@ -1,10 +1,10 @@
 package com.migratorydata.authorization.token;
 
-import com.migratorydata.authorization.def.DefaultAuthorizationHandler;
 import com.migratorydata.authorization.common.client.Session;
 import com.migratorydata.authorization.common.token.Token;
 import com.migratorydata.authorization.common.token.TokenExpirationHandler;
 import com.migratorydata.authorization.helper.ClientCredentials;
+import com.migratorydata.authorization.hub.HubAuthorizationHandler;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,7 +28,7 @@ public class TokenExpirationHandlerTest {
 
         Thread.sleep(2000);
 
-        Assert.assertTrue(client1.getNotification().getStatus().equals(DefaultAuthorizationHandler.TOKEN_TO_EXPIRE.getStatus()));
+        Assert.assertTrue(client1.getNotification().getStatus().equals(HubAuthorizationHandler.TOKEN_TO_EXPIRE.getStatus()));
 
         Thread.sleep(5000);
 
@@ -50,7 +50,7 @@ public class TokenExpirationHandlerTest {
 
         Thread.sleep(2000);
 
-        Assert.assertTrue(client1.getNotification().getStatus().equals(DefaultAuthorizationHandler.TOKEN_TO_EXPIRE.getStatus()));
+        Assert.assertTrue(client1.getNotification().getStatus().equals(HubAuthorizationHandler.TOKEN_TO_EXPIRE.getStatus()));
 
         s1.setTokenRenewalCompleted();
 

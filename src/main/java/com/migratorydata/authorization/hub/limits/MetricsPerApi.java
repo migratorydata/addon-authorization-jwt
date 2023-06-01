@@ -25,13 +25,15 @@ public class MetricsPerApi {
         }));
     }
 
-    public void countMessages(String subject) {
-        Integer count = clientsPerSubject.get(subject);
-        messages++; // +1 for publish message
-        //TODO: multiply the number of messages with the number of servers
-        if (count != null) {
-            messages += count; // +number of sessions, message broadcast
+    public void countMessages(String subject, int numberOfClusterMembers) {
+        if (clientsPerSubject.containsKey(subject)) {
+            Integer count = clientsPerSubject.get(subject);
+            if (count > 1) {
+                count = count * numberOfClusterMembers;
+            }
+            messages += count; // number of out messages (broadcast)
         }
+        messages++; // +1 for in message (publish)
     }
 
     public long getAndReset() {

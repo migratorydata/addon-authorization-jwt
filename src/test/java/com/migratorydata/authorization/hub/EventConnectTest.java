@@ -1,23 +1,58 @@
 package com.migratorydata.authorization.hub;
 
-import com.migratorydata.authorization.common.config.Configuration;
-import com.migratorydata.authorization.hub.common.CommonUtils;
-import com.migratorydata.authorization.hub.common.Producer;
+import com.migratorydata.authorization.helper.ClientCredentials;
+import com.migratorydata.authorization.helper.EventConnect;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-public class EventConnectTest extends com.migratorydata.authorization.EventConnectTest {
+import static com.migratorydata.authorization.hub.HubAuthorizationHandler.TOKEN_EXPIRED;
+import static com.migratorydata.authorization.hub.HubAuthorizationHandler.TOKEN_INVALID;
+import static com.migratorydata.authorization.token.SessionOrderTest.generateToken;
 
-    @Override
-    protected void initialize() {
-        Configuration conf = Configuration.getConfiguration();
+public class EventConnectTest extends EventBase {
 
-        String jws = CommonUtils.generateToken(conf.getApiSegment(),
-                CommonUtils.createAllPermissions("/" + conf.getAdminUserSegment() + "/" + conf.getApiSegment() + "/*"),
-                conf.getSecretKey());
+    private final String clientAddress = "127.0.0.1:35274";
+    private final String expiredToken = generateToken(-100);
+    private final String validToken = generateToken(100);
 
-        Producer producer = new Producer(conf.getClusterInternalServers(), jws);
+    @Before
+    public void onStart() {
+        initialize();
+    }
 
-        authorizationListener = new HubAuthorizationHandler(producer, conf.getSubjectStats(), conf.getClusterServerId(),
-                conf.getMillisBeforeRenewal(), conf.getJwtVerifyParser(), conf.getUrlRevokedTokens(), conf.getUrlApiLimits());
+    @After
+    public void onDispose() {
+        authorizationListener.onDispose();
+    }
+
+    @Test
+    public void test_null_token() {
+        EventConnect eventConnect = new EventConnect(new ClientCredentials(null, clientAddress));
+        authorizationListener.onClientConnect(eventConnect);
+        Assert.assertTrue(eventConnect.getReason() == TOKEN_INVALID.getStatus());
+    }
+
+    @Test
+    public void test_empty_token() {
+        EventConnect eventConnect = new EventConnect(new ClientCredentials("", clientAddress));
+        authorizationListener.onClientConnect(eventConnect);
+        Assert.assertTrue(eventConnect.getReason() == TOKEN_INVALID.getStatus());
+    }
+
+    @Test
+    public void test_expired_token() {
+        EventConnect eventConnect = new EventConnect(new ClientCredentials(expiredToken, clientAddress));
+        authorizationListener.onClientConnect(eventConnect);
+        Assert.assertTrue(eventConnect.getReason() == TOKEN_EXPIRED.getStatus());
+    }
+
+    @Test
+    public void test_valid_token() {
+        EventConnect eventConnect = new EventConnect(new ClientCredentials(validToken, clientAddress));
+        authorizationListener.onClientConnect(eventConnect);
+        Assert.assertTrue(eventConnect.getReason() == "TOKEN_VALID");
     }
 
 }

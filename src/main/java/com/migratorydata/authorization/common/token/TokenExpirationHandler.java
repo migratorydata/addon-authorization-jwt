@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.migratorydata.authorization.def.DefaultAuthorizationHandler.TOKEN_TO_EXPIRE;
+import static com.migratorydata.authorization.hub.HubAuthorizationHandler.TOKEN_TO_EXPIRE;
 
 public class TokenExpirationHandler {
     private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();

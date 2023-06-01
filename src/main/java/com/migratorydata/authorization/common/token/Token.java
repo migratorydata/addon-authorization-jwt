@@ -8,8 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.migratorydata.authorization.def.DefaultAuthorizationHandler.TOKEN_EXPIRED;
-import static com.migratorydata.authorization.def.DefaultAuthorizationHandler.TOKEN_INVALID;
+import static com.migratorydata.authorization.hub.HubAuthorizationHandler.TOKEN_EXPIRED;
+import static com.migratorydata.authorization.hub.HubAuthorizationHandler.TOKEN_INVALID;
 
 public class Token {
     private final String token;

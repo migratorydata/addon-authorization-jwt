@@ -21,11 +21,13 @@ public class LimitsAgregationHandler {
     private final String serverName;
     private final String topicStats;
 
+    private final int numberOfClusterMembers;
+
     private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     private Map<String, MetricsPerApi> apis = new HashMap<>();
 
-    public LimitsAgregationHandler(Producer producer, String serverName, String topicStats) {
+    public LimitsAgregationHandler(Producer producer, String serverName, String topicStats, int numberOfClusterMembers) {
         this.producer = producer;
 
         this.serverName = serverName;
@@ -38,6 +40,8 @@ public class LimitsAgregationHandler {
                 e.printStackTrace();
             }
         }, 0, 5, TimeUnit.SECONDS);
+
+        this.numberOfClusterMembers = numberOfClusterMembers;
     }
 
 
@@ -87,7 +91,7 @@ public class LimitsAgregationHandler {
         executor.execute(() -> {
             MetricsPerApi metricsPerApi = apis.get(appId);
             if (metricsPerApi != null) {
-                metricsPerApi.countMessages(subject);
+                metricsPerApi.countMessages(subject, numberOfClusterMembers);
             }
         });
     }
