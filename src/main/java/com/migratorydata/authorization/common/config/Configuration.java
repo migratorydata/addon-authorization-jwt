@@ -56,9 +56,9 @@ public class Configuration {
     }
 
     private static Properties loadConfiguration() {
-        Properties props = readPropertiesFile("./addons/authorization-jwt/configuration.properties");
+        Properties props = readPropertiesFile("./addons/authorization-hub/configuration.properties");
         if (props == null) {
-            props = readPropertiesFile("/etc/migratorydata/addons/authorization-jwt/configuration.properties");
+            props = readPropertiesFile("/etc/migratorydata/addons/authorization-hub/configuration.properties");
         }
         if (props == null) {
             props = new Properties();
@@ -90,9 +90,6 @@ public class Configuration {
         }
         if (System.getProperties().containsKey("web.password")) {
             props.put("web.password", System.getProperty("web.password"));
-        }
-        if (System.getProperties().containsKey("extension.hub")) {
-            props.put("extension.hub", System.getProperty("extension.hub"));
         }
 
         return props;
@@ -159,10 +156,6 @@ public class Configuration {
         byte[] encoded = Base64.getDecoder().decode(publicKeyPEM);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         return keyFactory.generatePublic(new X509EncodedKeySpec(encoded));
-    }
-
-    public boolean hubExtensionEnabled() {
-        return Boolean.parseBoolean(properties.getProperty("extension.hub", "false"));
     }
 
     public String getSubjectStats() {

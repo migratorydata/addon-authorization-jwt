@@ -74,15 +74,15 @@ public class HubAuthorizationHandler implements MigratoryDataAuthorizationListen
         }, nextHour, 3600, TimeUnit.SECONDS);
 
         executor.scheduleAtFixedRate(() -> {
-            // load revoked tokens from local database
+            // load revoked tokens from api hub
             offer(this::updateRevokedTokens);
-        }, 1, 60, TimeUnit.SECONDS);
+        }, 5, 60, TimeUnit.SECONDS);
 
         executor.scheduleAtFixedRate(() -> {
             offer(() -> {
                 updateLimits(getApiLimits());
             });
-        }, 1, 180, TimeUnit.SECONDS);
+        }, 5, 180, TimeUnit.SECONDS);
 
         executor.scheduleAtFixedRate(() -> {
             offer(() -> {
@@ -302,8 +302,6 @@ public class HubAuthorizationHandler implements MigratoryDataAuthorizationListen
         if (applicationsLimit == null) {
             return;
         }
-
-        //System.out.println(applicationsLimit.toString());
 
         for (int i = 0; i < applicationsLimit.length(); i++) {
             JSONObject app = applicationsLimit.getJSONObject(i);

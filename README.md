@@ -12,17 +12,17 @@ Please refer to the following <a target="_blank" href="https://migratorydata.com
 This add-on is preinstalled in the MigratoryData server under the following folder,
 according to the package type used to install the MigratoryData server:
 
-| Location                                      | Package type                         |
-|-----------------------------------------------|--------------------------------------|
-| `addons/authorization-jwt`                          | Platform-independent tarball package |
-| `/usr/share/migratorydata/addons/authorization-jwt` | `RPM` or `DEB` Linux package         |
+| Location                                            | Package type                         |
+|-----------------------------------------------------|--------------------------------------|
+| `addons/authorization-hub`                          | Platform-independent tarball package |
+| `/usr/share/migratorydata/addons/authorization-hub` | `RPM` or `DEB` Linux package         |
 
 Its default configuration is available under the following folder:
 
-| Location                                    | Package type                         |
-|---------------------------------------------|--------------------------------------|
-| `addons/authorization-jwt`                        | Platform-independent tarball package |
-| `/etc/migratorydata/addons/authorization-jwt`     | `RPM` or `DEB` Linux package         |
+| Location                                      | Package type                         |
+|-----------------------------------------------|--------------------------------------|
+| `addons/authorization-hub`                    | Platform-independent tarball package |
+| `/etc/migratorydata/addons/authorization-hub` | `RPM` or `DEB` Linux package         |
 
 The add-on is automatically enabled the parameter 
 [Entitlement](http://localhost:1313/docs/migratorydata/configuration/core-parameters/#entitlement) of the MigratoryData server is set on `JWT`.
@@ -36,14 +36,14 @@ You can modify the source code of this add-on to fit your needs. The add-on is b
 You can use the following commands to get and build the add-on:
 
 ```bash
-$ git clone https://github.com/migratorydata/addon-authorization-jwt.git
-$ cd addon-authorization-jwt
+$ git clone https://github.com/migratorydata/addon-authorization-hub.git
+$ cd addon-authorization-hub
 $ ./gradlew clean build shadowJar
 ```
 
 #### Deploying the modified add-on
 
-1. Copy the modified add-on from `addon-authorization-jwt/build/libs/authorization.jar` to the following location of your MigratoryData server installation:
+1. Copy the modified add-on from `addon-authorization-hub/build/libs/authorization.jar` to the following location of your MigratoryData server installation:
 
 | Location                          | Package type                         |
 |-----------------------------------|--------------------------------------|

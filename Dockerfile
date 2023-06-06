@@ -5,5 +5,5 @@ RUN gradle build shadowJar
 
 FROM migratorydata/server:6.0-test
 WORKDIR /migratorydata
-COPY --from=build-extension /home/gradle/src/build/libs/authorization.jar ./addons/authorization-jwt/authorization.jar
+COPY --from=build-extension /home/gradle/src/build/libs/authorization.jar ./addons/authorization-hub/authorization.jar
 CMD ["./start-migratorydata.sh"]
