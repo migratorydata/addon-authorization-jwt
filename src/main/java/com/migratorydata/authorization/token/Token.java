@@ -27,13 +27,10 @@ public class Token {
             jwsClaims = jwtParser.parseClaimsJws(token);
             permissions = new Permissions((Map<String, List<String>>) jwsClaims.getBody().get(Util.PERMISSIONS_FIELD));
         } catch (MalformedJwtException e1) {
-            e1.printStackTrace();
             errorNotification = TOKEN_INVALID;
         } catch (JwtException ex) {
-            ex.printStackTrace();
             errorNotification = TOKEN_EXPIRED;
         } catch (Exception e) {
-            e.printStackTrace();
             errorNotification = TOKEN_INVALID;
         }
         return (errorNotification == null);
