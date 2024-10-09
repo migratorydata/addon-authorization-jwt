@@ -30,10 +30,10 @@ public class AuthorizationHandler implements MigratoryDataAuthorizationListener 
         tokenExpirationHandler = new TokenExpirationHandler(conf.getMillisBeforeRenewal());
 
         if ("hmac".equals(conf.getSignatureType())) {
-            jwtVerifyParser = Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(conf.getHMACSecretKey()))).build();
+            jwtVerifyParser = Jwts.parser().setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(conf.getHMACSecretKey()))).build();
         } else if ("rsa".equals(conf.getSignatureType())){
             try {
-                jwtVerifyParser = Jwts.parserBuilder().setSigningKey(conf.getRSAPublicKey()).build();
+                jwtVerifyParser = Jwts.parser().setSigningKey(conf.getRSAPublicKey()).build();
             } catch (Exception e) {
                 e.printStackTrace();
             }
